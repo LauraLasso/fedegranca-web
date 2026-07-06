@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FEDEGRANCA | Federación Empresarial de Gran Canaria</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <style>
+    /* ── FEDEGRANCA BRAND TOKENS ── */
+    :root {
+      --fed-a:    #e84f1c;
+      --fed-b:    #f07830;
+      --fed-c:    #f5a623;
+      --fed-grad: linear-gradient(135deg, #c93a0e 0%, #e84f1c 40%, #f5a623 100%);
+      --fed-tint: #fff4ef;
+      --fed-border: #fddac9;
+    }
+
+    /* ── DIRECTORIO MODAL ── */
+    .dir-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(15,5,0,.6); z-index: 9000;
+      padding: 2rem 1rem; align-items: center; justify-content: center;
+    }
+    .dir-overlay.active { display: flex; }
+    .dir-panel {
+      background: #fff; border-radius: 16px;
+      width: 100%; max-width: 1060px;
+      height: 88vh; max-height: 88vh;
+      display: flex; flex-direction: column;
+      box-shadow: 0 24px 80px rgba(200,60,14,.18);
+      overflow: hidden; animation: slideUp .25s ease;
+      transition: max-width .3s ease, height .3s ease, max-height .3s ease;
+    }
+    .dir-panel.view-map {
+      max-width: 1320px; height: 94vh; max-height: 94vh;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .dir-header {
+      background: var(--fed-grad); color: #fff;
+      padding: 1.6rem 2rem 1.2rem;
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 1rem; flex-shrink: 0;
+    }
+    .dir-header-info h2 { 
+      font-size: 1.45rem; 
+      font-weight: 700; 
+      margin-bottom: .25rem; 
+      letter-spacing: -.01em; 
+      color: #fff; /* <── Añade esta línea */
+    }
+    .dir-header-info p  { font-size: .9rem; opacity: .88; }
+    .dir-close {
+      background: rgba(255,255,255,.2); border: none; border-radius: 50%;
+      width: 38px; height: 38px; cursor: pointer; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background .15s;
+    }
+    .dir-close:hover { background: rgba(255,255,255,.35); }
+    .dir-close svg { width: 16px; height: 16px; stroke: #fff; stroke-width: 2.2; }
+    .dir-header-actions { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; }
+    .dir-filters {
+      padding: 1rem 2rem .7rem; background: #fff;
+      border-bottom: 1px solid #f0ebe8;
+      display: flex; flex-wrap: wrap; gap: .45rem;
+      align-items: center; flex-shrink: 0;
+    }
+    .dir-search {
+      flex: 1; min-width: 180px; max-width: 280px;
+      padding: .45rem .9rem; border: 1.5px solid #e5ddd8;
+      border-radius: 8px; font-size: .88rem; outline: none;
+      background: #faf7f5; color: #333;
+      transition: border-color .15s, background .15s;
+    }
+    .dir-search:focus { border-color: var(--fed-a); background: #fff; }
+    .dir-cat-btn {
+      padding: .36rem .9rem; border-radius: 20px; border: none;
+      background: #f5f0ec; font-size: .82rem; cursor: pointer;
+      color: #555; font-weight: 500;
+      transition: background .15s, color .15s; white-space: nowrap;
+    }
+    .dir-cat-btn:hover { background: #fde3d3; color: var(--fed-a); }
+    .dir-cat-btn.on { background: var(--fed-grad); color: #fff; font-weight: 600; }
+    .dir-count {
+      padding: .5rem 2rem; font-size: .82rem; color: #888;
+      border-bottom: 1px solid #f0ebe8; flex-shrink: 0;
+    }
+    .dir-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem; padding: 1.4rem 2rem 2rem;
+      overflow-y: auto; flex: 1; align-content: start;
+    }
+    .dir-card {
+      background: #fff; border: 1px solid #ede8e5; border-radius: 12px;
+      padding: 1.1rem 1rem .9rem; display: flex; flex-direction: column;
+      gap: .35rem; transition: box-shadow .2s, transform .2s, border-color .2s;
+    }
+    .dir-card:hover {
+      box-shadow: 0 6px 24px rgba(232,79,28,.13);
+      border-color: var(--fed-border); transform: translateY(-2px);
+    }
+    .dir-card-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: var(--fed-tint);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: .15rem; flex-shrink: 0;
+    }
+    .dir-card-icon svg {
+      width: 20px; height: 20px; stroke: var(--fed-a);
+      stroke-width: 1.7; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .dir-card-name { font-size: .92rem; font-weight: 600; color: #1a1a1a; line-height: 1.3; }
+    .dir-card-cat {
+      font-size: .71rem; font-weight: 600; letter-spacing: .03em;
+      text-transform: uppercase; padding: .18rem .55rem; border-radius: 20px;
+      display: inline-block; width: fit-content; margin-bottom: .05rem;
+      background: #fde8da; color: #c94010;
+    }
+    .dir-card-sector { font-size: .78rem; color: #777; line-height: 1.35; }
+    .dir-card-dir { font-size: .74rem; color: #999; margin-top: .2rem; display: flex; gap: .3rem; align-items: flex-start; }
+    .dir-card-tel { font-size: .74rem; color: #999; display: flex; gap: .3rem; align-items: center; }
+    .dir-card-dir .meta-icon, .dir-card-tel .meta-icon { flex-shrink: 0; margin-top: 1px; }
+    .dir-card-dir .meta-icon svg, .dir-card-tel .meta-icon svg {
+      width: 12px; height: 12px; stroke: #bbb; stroke-width: 1.8;
+      fill: none; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .dir-card-dir a  { color: #999; text-decoration: none; }
+    .dir-card-dir a:hover { color: var(--fed-a); text-decoration: underline; }
+    .dir-empty { grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: #bbb; font-size: .95rem; }
+
+    /* ── INTERRUPTOR LISTA / MAPA (en la cabecera) ── */
+    .dir-view-switch {
+      display: flex; align-items: center; gap: .5rem;
+      cursor: pointer; user-select: none;
+    }
+    .dir-view-label { font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.75); transition: color .15s; }
+    .dir-toggle {
+      position: relative; width: 42px; height: 22px; border-radius: 20px;
+      background: rgba(255,255,255,.25); flex-shrink: 0; transition: background .2s;
+    }
+    .dir-toggle.on { background: rgba(255,255,255,.9); }
+    .dir-toggle-knob {
+      position: absolute; top: 2px; left: 2px; width: 18px; height: 18px;
+      border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25);
+      transition: transform .2s, background .2s;
+    }
+    .dir-toggle.on .dir-toggle-knob { transform: translateX(20px); background: var(--fed-a); }
+
+    /* ── AVISO EMERGENTE: MODO MAPA POR DEFECTO ── */
+    .dir-view-switch-wrap { position: relative; }
+    .dir-view-hint {
+      position: absolute; top: calc(100% + 10px); right: 0;
+      width: 230px; background: #1f1a17; color: #fff;
+      font-size: .74rem; font-weight: 500; line-height: 1.45;
+      padding: .7rem .9rem; border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(0,0,0,.25);
+      opacity: 0; transform: translateY(-6px); pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+      z-index: 20;
+    }
+    .dir-view-hint strong { color: #ffb083; font-weight: 700; }
+    .dir-view-hint.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .dir-view-hint-arrow {
+      position: absolute; top: -6px; right: 22px;
+      width: 12px; height: 12px; background: #1f1a17;
+      transform: rotate(45deg); border-radius: 2px;
+    }
+
+    /* ── CONTENEDOR DE MAPA ── */
+    .dir-map {
+      flex: 1; padding: 1rem 1.4rem 1.4rem; overflow: hidden;
+      opacity: 0; transition: opacity .25s ease;
+      display: flex;
+    }
+    .dir-map.dir-visible { opacity: 1; }
+    .dir-map iframe {
+      width: 100%; height: 100%; min-height: 420px; border: 0;
+      border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.08);
+      flex: 1;
+    }
+    .dir-grid { opacity: 0; transition: opacity .25s ease; }
+    .dir-grid.dir-visible { opacity: 1; }
+    .dir-hidden { display: none !important; }
+    .dir-panel.view-map .dir-filters,
+    .dir-panel.view-map .dir-count { display: none !important; }
+    @media(max-width:600px) {
+      .dir-view-label { display: none; }
+    }
+    @media(max-width:600px) {
+      .dir-overlay { padding: 0; align-items: flex-end; }
+      .dir-panel { height: 95vh; max-height: 95vh; border-radius: 16px 16px 0 0; }
+      .dir-header { padding: 1.2rem 1rem 1rem; }
+      .dir-header-info h2 { font-size: 1.15rem; }
+      .dir-filters { padding: .8rem 1rem .5rem; }
+      .dir-grid { padding: 1rem; gap: .7rem; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); }
+      .dir-count { padding: .4rem 1rem; }
+    }
+
+    /* ── DISEÑO GENERAL ── */
+    :root {
+      --primary: #F05A4A; --primary-dark: #D64435;
+      --accent: #F58220; --accent-light: #FFA041;
+      --text-dark: #1E293B; --text-muted: #64748B;
+      --bg-light: #F8FAFC; --bg-white: #FFFFFF;
+      --font-title: 'Playfair Display', serif;
+      --font-body: 'Montserrat', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-body); color: var(--text-dark); background-color: var(--bg-light); line-height: 1.6; }
+    body.modal-open { overflow: hidden; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    h1, h2, h3 { font-family: var(--font-title); color: var(--text-dark); }
+    a { text-decoration: none; color: inherit; }
+
+    header { background: var(--bg-white); box-shadow: 0 4px 20px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+    .nav-wrap { display: flex; justify-content: space-between; align-items: center; padding: 0.2rem 0; }
+    .logo-container { display: flex; align-items: center; }
+    .logo-nav { height: 95px; width: auto; object-fit: contain; transition: transform 0.3s ease; }
+    .logo-nav:hover { transform: scale(1.02); }
+    nav ul { display: flex; list-style: none; gap: 2rem; }
+    nav ul a { font-size: 0.95rem; font-weight: 600; transition: color 0.3s; color: var(--text-dark); }
+    nav ul a:hover { color: var(--primary); }
+
+    .hero {
+      position: relative;
+      /* 1. Degradado MODIFICADO: Bajamos la opacidad de los colores (de 0.94/0.96 a 0.60/0.70) para que la foto sea MÁS visible */
+      /* EJEMPLO — sustituir por la imagen de fondo definitiva */
+      background-image: linear-gradient(135deg, rgba(255, 244, 239, 0.60) 0%, rgba(255, 248, 245, 0.70) 100%),
+        /* url('https://images.unsplash.com/photo-1523592121529-f6dde35f079e?auto=format&fit=crop&w=1920&q=80'); */
+        url(img/fondo-laspalmas.png);
+      background-size: cover; background-position: center; background-attachment: fixed;
+      
+      /* Mantenemos el resto igual para asegurar legibilidad */
+      color: var(--text-dark); padding: 6rem 0 7rem; text-align: center; overflow: hidden;
+    }
+    .hero::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background-image: radial-gradient(rgba(232, 79, 28, 0.05) 1px, transparent 1px);
+      background-size: 24px 24px; opacity: 1; pointer-events: none;
+    }
+    .hero .container { position: relative; z-index: 2; }
+    .hero-logo-container { display: flex; justify-content: center; margin-bottom: 3rem; }
+    .logo-hero { height: 190px; width: auto; object-fit: contain; filter: drop-shadow(0px 8px 20px rgba(232, 79, 28, 0.08)); transition: transform 0.4s ease; }
+    .logo-hero:hover { transform: scale(1.03); }
+    .hero h1 { color: var(--text-dark); font-size: 2.8rem; margin-bottom: 1.2rem; font-weight: 700; text-shadow: 0 1px 18px rgba(255,255,255,0.55); }
+    .hero p {
+      color: #2d3441;
+      font-size: 1.1rem;
+      max-width: 760px;
+      margin: 0 auto 2rem;
+      font-weight: 500;
+      line-height: 1.7;
+      letter-spacing: 0.1px;
+      background: rgba(255, 255, 255, 0.62);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border: 1px solid rgba(232, 79, 28, 0.15);
+      border-radius: 14px;
+      padding: 1.3rem 2rem;
+      box-shadow: 0 8px 28px rgba(15, 23, 42, 0.08);
+      position: relative;
+    }
+    .hero p::before {
+      content: "";
+      display: block;
+      width: 46px;
+      height: 2px;
+      background: var(--fed-grad, var(--primary));
+      margin: 0 auto 0.9rem;
+    }
+    .hero-badges { display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+    .badge { background: #fff4ef; border: 1px solid rgba(240, 120, 48, 0.25); padding: 0.5rem 1.2rem; border-radius: 50px; font-size: 0.85rem; font-weight: 600; color: var(--fed-a); box-shadow: 0 2px 6px rgba(232,79,28,0.03); }
+    
+    .section { padding: 5rem 0; }
+    .section-eyebrow { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; color: var(--primary); font-weight: 700; margin-bottom: 0.5rem; text-align: center; }
+    .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 3rem; color: var(--text-dark); }
+
+    .about-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 4rem; align-items: center; }
+    .about-text p { margin-bottom: 1.5rem; color: var(--text-dark); }
+    .pillars { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+    .pillar-card { background: var(--bg-white); padding: 1.5rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border-left: 4px solid var(--accent); }
+    .pillar-card h3 { font-family: var(--font-body); font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-dark); }
+    .pillar-card p { font-size: 0.85rem; color: var(--text-muted); }
+
+    .asociados { background-color: #F1F5F9; }
+    .asociados-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+    .asociado-card {
+      background: var(--bg-white); border: 1px solid #E2E8F0; border-radius: 12px;
+      padding: 1.2rem; display: flex; flex-direction: column; align-items: flex-start;
+      transition: all 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+      height: 100%;
+    }
+    .asociado-card:hover { transform: translateY(-6px); box-shadow: 0 16px 24px -4px rgba(30,41,59,0.08); border-color: #CBD5E1; }
+    .asociado-zona-foto {
+      width: 100%; height: 160px; object-fit: cover; border-radius: 8px;
+      margin-bottom: .9rem; filter: saturate(1.02);
+    }
+    .asociado-contacto { display: flex; flex-direction: column; gap: .3rem; margin-bottom: .8rem; width: 100%; min-height: 3rem; }
+    .asociado-contacto a, .asociado-contacto span {
+      display: flex; align-items: center; gap: .4rem; font-size: .8rem; color: var(--text-muted);
+    }
+    .asociado-contacto a { transition: color .15s; }
+    .asociado-contacto a:hover { color: var(--primary); }
+    .asociado-contacto i { width: 14px; color: var(--accent); }
+    .asociado-social { display: flex; gap: .6rem; margin-bottom: 1rem; min-height: 28px; }
+    .asociado-social a {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%; background: #F1F5F9;
+      color: var(--text-muted); font-size: .8rem; transition: all .2s;
+    }
+    .asociado-social a:hover { background: var(--primary); color: #fff; }
+
+    .asociado-logo-container {
+      width: 100%; height: 70px; display: flex; align-items: center; justify-content: center;
+      background-color: #F8FAFC; border-radius: 8px; margin-bottom: 1.2rem;
+      padding: .6rem; border: 1px solid #F1F5F9; overflow: hidden;
+    }
+    .asociado-logo { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.02)); }
+    .asociado-zona { font-size: 0.8rem; text-transform: capitalize; font-weight: 500; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .asociado-nombre { font-family: var(--font-body); font-size: 1.25rem; font-weight: 700; color: var(--text-dark); margin-bottom: 1.2rem; line-height: 1.3; min-height: 2.6rem; }
+    .btn-asociado {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%);
+      color: var(--bg-white); padding: 0.6rem 1.6rem; font-size: 0.85rem;
+      font-weight: 600; border-radius: 6px; transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(240,90,74,0.15); cursor: pointer;
+      margin-top: auto;
+    }
+    .btn-asociado:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 6px 14px rgba(240,90,74,0.25); }
+
+    .contacto-section { background-color: var(--bg-light); }
+    .contacto-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 3rem; margin-top: 2rem; }
+    .contacto-info { display: flex; flex-direction: column; gap: 1.5rem; }
+    .contacto-card { background: var(--bg-white); padding: 1.8rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border-top: 3px solid var(--primary); }
+    .contacto-card h3 { font-family: var(--font-body); font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text-dark); }
+    .contacto-card p { color: var(--text-muted); font-size: 0.95rem; }
+    .contacto-card a { color: var(--primary); font-weight: 600; transition: color 0.2s; }
+    .contacto-card a:hover { color: var(--primary-dark); text-decoration: underline; }
+    .contacto-form-wrapper { background: var(--bg-white); padding: 2.5rem; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-dark); }
+    .form-control { width: 100%; padding: 0.75rem 1rem; font-family: var(--font-body); font-size: 0.9rem; border: 1px solid #E2E8F0; border-radius: 6px; background-color: var(--bg-light); color: var(--text-dark); transition: all 0.3s ease; }
+    .form-control:focus { outline: none; border-color: var(--primary); background-color: var(--bg-white); box-shadow: 0 0 0 3px rgba(240,90,74,0.1); }
+    textarea.form-control { resize: vertical; min-height: 120px; }
+    .btn-submit { background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%); color: white; border: none; padding: 0.9rem 2rem; font-family: var(--font-body); font-size: 0.95rem; font-weight: 600; border-radius: 6px; cursor: pointer; width: 100%; transition: opacity 0.2s; box-shadow: 0 4px 12px rgba(240,90,74,0.2); }
+    .btn-submit:hover { opacity: 0.95; }
+
+    footer { background: var(--text-dark); color: rgba(255,255,255,0.7); padding: 4rem 0 2rem; font-size: 0.85rem; border-top: 4px solid var(--primary); }
+    .footer-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem; margin-bottom: 3rem; }
+    .footer-col h4 { color: white; font-family: var(--font-body); font-size: 1.1rem; font-weight: 700; margin-bottom: 1.2rem; }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 0.7rem; }
+    .footer-links a { color: rgba(255,255,255,0.7); cursor: pointer; transition: color 0.2s, padding-left 0.2s; }
+    .footer-links a:hover { color: var(--accent-light); padding-left: 4px; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .footer-socials { display: flex; gap: 1rem; margin-top: 1.5rem; }
+    .social-icon { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); font-size: 1.1rem; transition: all 0.3s ease; }
+    .social-icon:hover { background: var(--accent); color: #FFFFFF; transform: translateY(-3px); }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.6); backdrop-filter: blur(4px); z-index: 1000; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-window { background: var(--bg-white); width: 90%; max-width: 750px; max-height: 85vh; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15); display: flex; flex-direction: column; transform: translateY(20px); transition: transform 0.3s ease; border-top: 6px solid var(--primary); }
+    .modal-overlay.active .modal-window { transform: translateY(0); }
+    .modal-header { padding: 1.5rem 2rem; border-bottom: 1px solid #E2E8F0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 1.4rem; color: var(--text-dark); }
+    .modal-close-btn { background: none; border: none; font-size: 1.8rem; color: var(--text-muted); cursor: pointer; line-height: 1; }
+    .modal-close-btn:hover { color: var(--primary); }
+    .modal-body { padding: 2rem; overflow-y: auto; font-size: 0.95rem; color: var(--text-dark); }
+    .modal-body h4 { margin: 1.5rem 0 0.5rem; color: var(--primary); font-family: var(--font-body); font-size: 1.1rem; }
+    .modal-body h4:first-child { margin-top: 0; }
+    .modal-body p { margin-bottom: 1rem; color: #334155; }
+    .modal-body ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+    .modal-body li { margin-bottom: 0.4rem; }
+
+    @media (max-width: 992px) { .about-grid { grid-template-columns: 1fr; gap: 3rem; } }
+    @media (max-width: 768px) {
+      .nav-wrap { flex-direction: column; gap: 0.5rem; padding: 1rem 0; }
+      .logo-nav { height: 75px; }
+      .contacto-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .hero h1 { font-size: 2rem; }
+      .logo-hero { height: 140px; }
+      .asociados-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+      .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+
+    /* ── CARRUSEL EVENTOS MEJORADO ── */
+    .events-section { padding: 4rem 0; background: #fff; position: relative; }
+    .swiper { width: 100%; height: 450px; border-radius: 16px; }
+    .swiper-slide { 
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 3rem; color: #fff; background-size: cover; background-position: center;
+    }
+    .swiper-slide::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+    .slide-content { position: relative; z-index: 2; }
+    .btn-event { display: inline-block; padding: 0.8rem 1.5rem; background: var(--primary); color: #fff; border-radius: 8px; font-weight: 600; text-decoration: none; margin-top: 1rem; }
+    .swiper-slide { 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: flex-end; 
+      padding: 3rem; 
+      color: #fff; /* El texto siempre será blanco */
+      background-size: cover !important; 
+      background-position: center !important; 
+      position: relative;
+    }
+
+    /* Esta capa asegura que la foto se oscurezca siempre, permitiendo que el texto blanco se lea */
+    .swiper-slide::before { 
+      content: ""; 
+      position: absolute; 
+      inset: 0; 
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 60%); 
+      z-index: 1;
+    }
+
+    .slide-content { 
+      position: relative; 
+      z-index: 2; 
+    }
+
+    /* Texto con sombra para mayor legibilidad */
+    .slide-content h3 { 
+      color: #fff; 
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .btn-event { 
+      display: inline-block; 
+      padding: 0.8rem 1.5rem; 
+      background: var(--primary); 
+      color: #fff; 
+      border-radius: 8px; 
+      font-weight: 600; 
+      text-decoration: none; 
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    /* ── ÚLTIMAS NOTICIAS ── */
+    .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; padding-top: 2rem; }
+    .news-card { background: #fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .news-date { color: var(--primary); font-size: 0.8rem; font-weight: 700; }
+    .news-card { 
+      background: #fff; border-radius: 12px; overflow: hidden; 
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.3s;
+    }
+    .news-card:hover { transform: translateY(-5px); }
+    .news-card img { width: 100%; height: 200px; object-fit: cover; }
+    .news-content { padding: 1.5rem; }
+    .btn-news { 
+      display: inline-block; margin-top: 1rem; padding: 0.6rem 1.2rem; 
+      background: var(--fed-a); color: #fff; border-radius: 6px; 
+      text-decoration: none; font-weight: 600;
+    }
+
+        .seccion-logos-fijos {
+      background: #ffffff !important;
+      background-image: none !important;
+      padding: 30px 20px !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      border: none !important;
+    }
+
+    /* Alinea los 7 logos en una sola fila horizontal espaciada */
+    .contenedor-logos-fijos {
+      display: flex !important;
+      flex-wrap: wrap !important; /* Si la pantalla es pequeña, se adaptan bajando */
+      justify-content: center !important;
+      align-items: center !important;
+      gap: 35px !important; /* Distancia elegante entre cada logo */
+      max-width: 1200px !important;
+      margin: 0 auto !important;
+      background: transparent !important;
+    }
+
+    /* Caja contenedora de cada logo individual */
+    .contenedor-logos-fijos .logo-item {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Control estricto del tamaño: logos pequeños y estilizados */
+    .contenedor-logos-fijos .logo-item img {
+      max-height: 50px !important; /* Altura máxima para que se vean finos como en Fecoeca */
+      max-width: 160px !important; /* Evita que logos alargados se hagan gigantes */
+      width: auto !important;
+      height: auto !important;
+      object-fit: contain !important;
+      filter: none !important; /* Por si tu plantilla intentara ponerlos en gris o blanco */
+    }
+
+    /* Ajuste sutil para pantallas de móvil */
+    @media (max-width: 768px) {
+      .contenedor-logos-fijos {
+        gap: 20px !important;
+      }
+      .contenedor-logos-fijos .logo-item img {
+        max-height: 40px !important; /* Un poco más pequeños en móviles */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL DIRECTORIO (estructura HTML vacía — lógica en directorio.js) -->
+  <div class="dir-overlay" id="dirOverlay" role="dialog" aria-modal="true" aria-labelledby="dirTitle">
+    <div class="dir-panel" id="dirPanel">
+      <div class="dir-header">
+        <div class="dir-header-info">
+          <h2 id="dirTitle">Directorio de Empresas</h2>
+          <p id="dirSubtitle"></p>
+        </div>
+        <div class="dir-header-actions">
+          <div class="dir-view-switch-wrap">
+            <label class="dir-view-switch" id="dirViewSwitch">
+              <span class="dir-view-label dir-view-label-list">Lista</span>
+              <span class="dir-toggle" id="dirToggle"><span class="dir-toggle-knob"></span></span>
+              <span class="dir-view-label dir-view-label-map">Mapa</span>
+            </label>
+            <div class="dir-view-hint" id="dirViewHint">
+              Vista de <strong>mapa</strong> por defecto — pulsa aquí para cambiar a <strong>lista</strong> y ver mejor el directorio
+              <span class="dir-view-hint-arrow"></span>
+            </div>
+          </div>
+          <button class="dir-close" id="dirClose" aria-label="Cerrar directorio">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="dir-filters" id="dirFilters">
+        <input type="text" class="dir-search" id="dirSearch" placeholder="Buscar empresa…" autocomplete="off">
+      </div>
+      <div class="dir-count" id="dirCount"></div>
+      <div class="dir-map" id="dirMap"></div>
+      <div class="dir-grid" id="dirGrid"></div>
+    </div>
+  </div>
+
+  <!-- CABECERA -->
+  <header>
+    <div class="container nav-wrap">
+      <div class="logo-container">
+        <img src="img/logo_blanco.png" alt="FEDEGRANCA" class="logo-nav">
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#nosotros">Sobre Nosotros</a></li>
+          <li><a href="#asociados">Asociaciones</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HÉROE -->
+  <section id="inicio" class="hero">
+    <div class="container">
+      <div class="hero-logo-container">
+        <img src="img/logo.png" alt="Logo FEDEGRANCA" class="logo-hero">
+      </div>
+      <h1>Comprometidos con el desarrollo económico de Gran Canaria</h1>
+      <p>Unimos la experiencia de asociaciones con más de 30 años de trayectoria para consolidar una voz unificada ante los nuevos retos económicos, la sostenibilidad y la digitalización.</p>
+      <div class="hero-badges">
+        <div class="badge">Representación Territorial</div>
+        <div class="badge">+470 Empresas Integradas</div>
+        <div class="badge">Equidad e Innovación</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EVENTOS -->
+  <section class="events-section container">
+    <h2 class="section-title">Próximos Eventos</h2>
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+        
+        <!-- Slide 1 -->
+        <div class="swiper-slide" style="background-image: url('https://images.unsplash.com/photo-1481277542470-605612bd2d61?auto=format&fit=crop&w=1200&q=80');">
+          <div class="slide-content">
+            <h3>Feria de Invierno</h3>
+            <a href="detalle-evento.html?id=feria-invierno" class="btn-event">Ver detalles</a>
+          </div>
+        </div>
+        
+        <!-- Slide 2 -->
+        <div class="swiper-slide" style="background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80');">
+          <div class="slide-content">
+            <h3>Jornada Tecnológica</h3>
+            <a href="detalle-evento.html?id=jornada-tecnologica" class="btn-event">Ver detalles</a>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="swiper-slide" style="background-image: url('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80');">
+          <div class="slide-content">
+            <h3>Encuentro Empresarial</h3>
+            <a href="detalle-evento.html?id=encuentro-empresarial" class="btn-event">Ver detalles</a>
+          </div>
+        </div>
+        
+      </div>
+      <!-- Flechas de navegación -->
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+    </div>
+  </section>
+
+  <!-- ÚLTIMAS NOTICIAS -->
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Últimas Noticias</h2>
+      <div class="news-grid">
+        
+        <div class="news-card">
+          <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=600&q=80" alt="Ayudas comercio">
+          <div class="news-content">
+            <span class="news-date">01 JUL 2026</span>
+            <h3>Nueva línea de ayudas para el comercio</h3>
+            <p>El Cabildo ha anunciado nuevas subvenciones para la modernización...</p>
+            <a href="noticia.html?id=innovacion-pymes" class="btn-news">Leer más</a>
+          </div>
+        </div>
+
+        <div class="news-card">
+          <img src="https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=600&q=80" alt="Reunión anual">
+          <div class="news-content">
+            <span class="news-date">28 JUN 2026</span>
+            <h3>Reunión anual de FEDEGRANCA</h3>
+            <p>Se establecieron los objetivos estratégicos para el próximo año...</p>
+            <a href="noticia.html?id=feria-comercial" class="btn-news">Leer más</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ASOCIACIONES -->
+  <section id="asociados" class="section asociados">
+    <div class="container">
+      <p class="section-eyebrow">Miembros</p>
+      <h2 class="section-title">Asociaciones Empresariales</h2>
+      <div class="asociados-grid">
+
+        <div class="asociado-card">
+          <img class="asociado-zona-foto" src="https://images.unsplash.com/photo-1580537659466-0a9bfa916a54?auto=format&fit=crop&w=500&q=80" alt="Zona comercial AELEYCA" onerror="this.style.display='none'">
+          <div class="asociado-logo-container">
+            <img src="img/asociaciones/aeleyca.png" alt="Logo AELEYCA" class="asociado-logo">
+          </div>
+          <div class="asociado-zona">Zona Las Palmas GC</div>
+          <div class="asociado-nombre">AELEYCA</div>
+          <!-- EJEMPLO — sustituir por los datos de contacto reales -->
+          <div class="asociado-contacto">
+            <a href="tel:+34633536663"><i class="fas fa-phone"></i> 633 53 66 63</a>
+            <a href="https://www.aeleyca.com/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> www.aeleyca.com</a>
+          </div>
+          <div class="asociado-social">
+            <a href="https://www.facebook.com/AELEYCA/?locale=es_ES" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/aeleyca/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="#" class="btn-asociado" onclick="openDir('AELEYCA','Zona Las Palmas GC');return false;">Directorio de empresas</a>
+        </div>
+
+        <div class="asociado-card">
+          <img class="asociado-zona-foto" src="https://images.unsplash.com/photo-1519999482648-25049ddd37b1?auto=format&fit=crop&w=500&q=80" alt="Zona comercial Asociación Comercial Schamann" onerror="this.style.display='none'">
+          <div class="asociado-logo-container">
+            <img src="img/asociaciones/schamann.png" alt="Logo Asociación Comercial Schamann" class="asociado-logo">
+          </div>
+          <div class="asociado-zona">Zona Las Palmas GC</div>
+          <div class="asociado-nombre">Asociación Comercial Schamann</div>
+          <!-- EJEMPLO — sustituir por los datos de contacto reales -->
+          <div class="asociado-contacto">
+            <a href="tel:+34658237535"><i class="fas fa-phone"></i> 658 23 75 35</a>
+            <a href="https://zonaschamann.com/?fbclid=IwY2xjawS11OxleHRuA2FlbQIxMABicmlkETBReU54RTZKUERKREI4dDZVc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHl8S-4Z5mXBtk81gcU-PuchhWJ8ikFy3tZZgoACBpGB9qjqztAWQmV6-BX7c_aem_10UzrNxare9l8aOw6Uqz1A" target="_blank" rel="noopener"><i class="fas fa-globe"></i> www.zonaschamann.com</a>
+          </div>
+          <div class="asociado-social">
+            <a href="https://www.facebook.com/zonacomercialyempresarialschamann/" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/zonacomercialschamann/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="#" class="btn-asociado" onclick="openDir('Schamann','Zona Las Palmas GC');return false;">Directorio de empresas</a>
+        </div>
+
+        <div class="asociado-card">
+          <img class="asociado-zona-foto" src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=500&q=80" alt="Zona comercial Zona Vegueta" onerror="this.style.display='none'">
+          <div class="asociado-logo-container">
+            <img src="img/asociaciones/vegueta.png" alt="Logo Zona Vegueta" class="asociado-logo">
+          </div>
+          <div class="asociado-zona">Zona Vegueta</div>
+          <div class="asociado-nombre">Zona Vegueta</div>
+          <!-- EJEMPLO — sustituir por los datos de contacto reales -->
+          <div class="asociado-contacto">
+            <!-- <a href="tel:+34928000000"><i class="fas fa-phone"></i> 928 000 000</a> -->
+            <a href="https://empresarioszonavegueta.es/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> www.empresarioszonavegueta.es</a>
+          </div>
+          <div class="asociado-social">
+            <a href="https://www.facebook.com/ViveVegueta/?ref=NONE_xav_ig_profile_page_web#" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/vive_vegueta/?hl=es" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="#" class="btn-asociado" onclick="openDir('Vegueta','Zona Vegueta');return false;">Directorio de empresas</a>
+        </div>
+
+        <div class="asociado-card">
+          <img class="asociado-zona-foto" src="https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=500&q=80" alt="Zona comercial EDARTE" onerror="this.style.display='none'">
+          <div class="asociado-logo-container">
+            <img src="img/asociaciones/edarte.png" alt="Logo EDARTE" class="asociado-logo" style="max-height:70%;max-width:70%">
+          </div>
+          <div class="asociado-zona">Zona Norte</div>
+          <div class="asociado-nombre">EDARTE</div>
+          <!-- EJEMPLO — sustituir por los datos de contacto reales -->
+          <div class="asociado-contacto">
+            <!-- <a href="tel:+34928000000"><i class="fas fa-phone"></i> 928 000 000</a> -->
+            <a href="https://descubreartenara.com/?utm_source=ig&utm_medium=social&utm_content=link_in_bio&fbclid=PAZXh0bgNhZW0CMTEAc3J0YwZhcHBfaWQPOTM2NjE5NzQzMzkyNDU5AAGni-m9acP5EVHjtSFRz9ZilkArrT6M6Flu-kc-GAVQKBmA9dc-qQlQLCzXmnk_aem_dEGk2vGAJwVRIyVkqPj7YQ" target="_blank" rel="noopener"><i class="fas fa-globe"></i> www.descrubeartenara.com</a>
+          </div>
+          <div class="asociado-social">
+            <a href="https://www.facebook.com/asociacionedarte/?locale=es_ES" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/descubreartenara/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="#" class="btn-asociado" onclick="openDir('Edarte','Zona Norte');return false;">Directorio de empresas</a>
+        </div>
+
+        <div class="asociado-card">
+          <img class="asociado-zona-foto" src="https://images.unsplash.com/photo-1523575708161-ad0fc2a9b951?auto=format&fit=crop&w=500&q=80" alt="Zona comercial ACOMISABA" onerror="this.style.display='none'">
+          <div class="asociado-logo-container">
+            <img src="img/asociaciones/acomisaba.png" alt="Logo ACOMISABA" class="asociado-logo">
+          </div>
+          <div class="asociado-zona">Zona Sur</div>
+          <div class="asociado-nombre">ACOMISABA</div>
+          <!-- EJEMPLO — sustituir por los datos de contacto reales -->
+          <div class="asociado-contacto">
+            <a href="tel:+34667588651"><i class="fas fa-phone"></i> 667 58 86 51</a>
+            <a href="https://www.acomisaba.com/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> www.acomisaba.com</a>
+          </div>
+          <div class="asociado-social">
+            <a href="https://www.facebook.com/acomisaba/" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/acomisaba/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="#" class="btn-asociado" onclick="openDir('ACOMISABA','Zona Sur');return false;">Directorio de empresas</a>
+        </div>
+
+        <div class="asociado-card">
+          <img class="asociado-zona-foto" src="https://images.unsplash.com/photo-1471623320832-752e8bbf8413?auto=format&fit=crop&w=500&q=80" alt="Zona comercial Asociación Puerto de Mogán" onerror="this.style.display='none'">
+          <div class="asociado-logo-container">
+            <img src="img/asociaciones/puerto-mogan.png" alt="Logo Asociación Puerto de Mogán" class="asociado-logo">
+          </div>
+          <div class="asociado-zona">Zona Sur</div>
+          <div class="asociado-nombre">Asociación Puerto de Mogán</div>
+          <!-- EJEMPLO — sustituir por los datos de contacto reales -->
+          <div class="asociado-contacto">
+            <a href="tel:+34609152283"><i class="fas fa-phone"></i> 609 15 22 83</a>
+            <a href="https://beacons.ai/moganplaya" target="_blank" rel="noopener"><i class="fas fa-globe"></i> www.moganplaya.com</a>
+          </div>
+          <div class="asociado-social">
+            <a href="https://www.facebook.com/p/Asociaci%C3%B3n-de-Empresarios-Playa-de-Mog%C3%A1n-100057415790170/" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/moganplaya" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="#" class="btn-asociado" onclick="openDir('PuertoMogan','Zona Sur — Playa de Mogán');return false;">Directorio de empresas</a>
+        </div>
+
+        <div class="asociado-card">
+          <img class="asociado-zona-foto" src="https://picsum.photos/seed/ascoive/500/300" alt="Zona comercial ASCOIVE" onerror="this.style.display='none'">
+          <div class="asociado-logo-container">
+            <img src="img/asociaciones/ascoive.png" alt="Logo ASCOIVE" class="asociado-logo">
+          </div>
+          <div class="asociado-zona">Zona Sureste</div>
+          <div class="asociado-nombre">ASCOIVE</div>
+          <!-- EJEMPLO — sustituir por los datos de contacto reales -->
+          <div class="asociado-contacto">
+            <a href="tel:+34928755516"><i class="fas fa-phone"></i> 928 75 55 16</a>
+            <a href="https://ascoive.org/" target="_blank" rel="noopener"><i class="fas fa-globe"></i> www.ascoive.org</a>
+          </div>
+          <div class="asociado-social">
+            <a href="https://www.facebook.com/ascoive.asociaciondeempresarios/?locale=es_ES" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/ascoivecentro/?hl=es" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="#" class="btn-asociado" onclick="openDir('ASCOIVE','Zona Sureste');return false;">Directorio de empresas</a>
+        </div>
+
+        <div class="asociado-card">
+          <img class="asociado-zona-foto" src="https://picsum.photos/seed/sataute/500/300" alt="Zona comercial SATAUTE COMERCIAL" onerror="this.style.display='none'">
+          <div class="asociado-logo-container">
+            <img src="img/asociaciones/sataute.png" alt="Logo SATAUTE COMERCIAL" class="asociado-logo">
+          </div>
+          <div class="asociado-zona">Zona Medianías</div>
+          <div class="asociado-nombre">SATAUTE COMERCIAL</div>
+          <!-- EJEMPLO — sustituir por los datos de contacto reales -->
+          <div class="asociado-contacto">
+            <a href="tel:+34683521186"><i class="fas fa-phone"></i> 683 52 11 86</a>
+            <!-- <a href="https://www.sataute.example.com" target="_blank" rel="noopener"><i class="fas fa-globe"></i> www.sataute.example.com</a> -->
+          </div>
+          <div class="asociado-social">
+            <a href="https://www.facebook.com/people/Asociaci%C3%B3n-de-Empresarios-y-Profesionales-Sataute-Comercial/61585329772564/" target="_blank" rel="noopener" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/satauteimpulsa/" target="_blank" rel="noopener" title="Instagram"><i class="fab fa-instagram"></i></a>
+          </div>
+          <a href="#" class="btn-asociado" onclick="openDir('Sataute','Zona Medianías — Santa Brígida');return false;">Directorio de empresas</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SOBRE NOSOTROS -->
+  <section id="nosotros" class="section">
+    <div class="container">
+      <p class="section-eyebrow">Institucional</p>
+      <h2 class="section-title">Sobre FEDEGRANCA</h2>
+      <div class="about-grid">
+        <div class="about-text">
+          <p><strong>FEDEGRANCA</strong> nace como resultado directo del proceso de reflexión y trabajo conjunto de ocho consolidadas asociaciones empresariales regionales. Nuestro fin prioritario es fortalecer de manera cohesionada el tejido empresarial y productivo de Gran Canaria.</p>
+          <p>Funcionamos como una plataforma abierta, integradora y profundamente colaborativa. Trabajamos activamente para dar visibilidad a las realidades de las zonas periféricas y rurales, defendiendo el comercio local y el equilibrio territorial intersectorial.</p>
+          <div class="pillars">
+            <div class="pillar-card">
+              <h3>Zonas Comerciales Abiertas</h3>
+              <p>Impulsamos y dinamizamos los espacios urbanos abiertos de encuentro donde confluye la actividad local.</p>
+            </div>
+            <div class="pillar-card" style="border-left-color: var(--primary);">
+              <h3>Equidad Territorial</h3>
+              <p>Garantizamos el equilibrio económico visibilizando activamente las áreas rurales y de la periferia.</p>
+            </div>
+          </div>
+        </div>
+        <div class="about-image-single" style="display: flex; justify-content: center; align-items: center;">
+          <img src="img/sobre-nosotros-1.png" alt="Zonas Comerciales Abiertas - FEDEGRANCA"
+               style="width: 100%; max-width: 500px; height: auto; object-fit: contain; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);"
+               onerror="this.src='https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=600&q=80'">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="section contacto-section">
+    <div class="container">
+      <p class="section-eyebrow">Comunicación</p>
+      <h2 class="section-title">Contacta con Nosotros</h2>
+      <div class="contacto-grid">
+        <div class="contacto-info">
+          <div class="contacto-card">
+            <h3>Correo Electrónico</h3>
+            <p>Para consultas generales, propuestas de adhesión o soporte institucional:</p>
+            <p style="margin-top: 0.5rem;"><a href="mailto:fedegranca@gmail.com">fedegranca@gmail.com</a></p>
+          </div>
+          <div class="contacto-card" style="border-top-color: var(--accent);">
+            <h3>Atención al Asociado</h3>
+            <p>Si eres miembro de alguna de nuestras asociaciones fundadoras y necesitas asistencia directa.</p>
+          </div>
+          <div class="contacto-card" style="border-top-color: var(--accent-light);">
+            <h3>Sede Central</h3>
+            <p>Federación Empresarial de Gran Canaria</p>
+            <p>Gran Canaria, Islas Canarias, España.</p>
+          </div>
+        </div>
+        <div class="contacto-form-wrapper">
+          <!--
+            CONFIGURACIÓN DE FORMSPREE:
+            1. Crea una cuenta gratuita en https://formspree.io
+            2. Crea un formulario nuevo y verifica fedegranca@gmail.com como destinatario
+            3. Copia tu endpoint (algo así como https://formspree.io/f/xxxxxxxx)
+            4. Sustituye "TU_ID_DE_FORMSPREE" más abajo por ese código
+          -->
+          <form id="contactoForm" action="https://formspree.io/f/TU_ID_DE_FORMSPREE" method="POST">
+            <div class="form-group">
+              <label for="name">Nombre Completo / Empresa</label>
+              <input type="text" id="name" name="name" class="form-control" placeholder="Ej. Juan Pérez o Empresa S.L." required>
+            </div>
+            <div class="form-group">
+              <label for="email">Dirección de Correo</label>
+              <input type="email" id="email" name="email" class="form-control" placeholder="nombre@correo.com" required>
+            </div>
+            <div class="form-group">
+              <label for="subject">Asunto de la Consulta</label>
+              <input type="text" id="subject" name="subject" class="form-control" placeholder="Ej. Información sobre adhesión" required>
+            </div>
+            <div class="form-group">
+              <label for="message">Mensaje / Detalles de la solicitud</label>
+              <textarea id="message" name="message" class="form-control" placeholder="Escriba aquí los detalles de su mensaje..." required></textarea>
+            </div>
+            <div id="contactoFormMsg" style="display:none; margin-bottom:1rem; padding:.8rem 1rem; border-radius:6px; font-size:.9rem;"></div>
+            <button type="submit" class="btn-submit" id="contactoFormBtn">Enviar Mensaje de Contacto</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Franja estática de logos institucionales -->
+  <div class="seccion-logos-fijos">
+    <div class="contenedor-logos-fijos">
+      <div class="logo-item"><img src="img/colaboradores/zonas_comerciales_abiertas.png" alt="Zonas comerciales abiertas"></div>
+      <div class="logo-item"><img src="img/colaboradores/mercados_tradicionales_canarias.png" alt="Mercados tradicionales de Canarias"></div>
+      <div class="logo-item"><img src="img/colaboradores/consume_canarias.png" alt="Consume Canarias"></div>
+      <div class="logo-item"><img src="img/colaboradores/comercio_canarias.png" alt="Comercio de Canarias"></div>
+      <div class="logo-item"><img src="img/colaboradores/camara_gran_canaria.png" alt="Cámara Gran Canaria"></div>
+      <div class="logo-item"><img src="img/colaboradores/cabildo_gran_canaria.png" alt="Cabildo de Gran Canaria"></div>
+      <div class="logo-item"><img src="img/colaboradores/gobierno_canarias.svg" alt="Gobierno de Canarias"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>FEDEGRANCA</h4>
+          <p>Federación Empresarial de Gran Canaria. Entidad comprometida con el desarrollo económico equilibrado, intersectorial y sostenible de nuestra isla.</p>
+          <div class="footer-socials">
+            <a href="https://www.facebook.com/fedegranca" target="_blank" rel="noopener noreferrer" class="social-icon" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/fedegranca" target="_blank" rel="noopener noreferrer" class="social-icon" title="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="https://x.com/fedegranca" target="_blank" rel="noopener noreferrer" class="social-icon" title="X (Twitter)"><i class="fab fa-x"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Transparencia</h4>
+          <ul class="footer-links">
+            <li><a data-modal="modal-transparencia-inst">Información Institucional</a></li>
+            <li><a data-modal="modal-transparencia-inst">Estructura Organizativa</a></li>
+            <li><a data-modal="modal-transparencia-econ">Contratos y Ayudas Públicas</a></li>
+            <li><a data-modal="modal-transparencia-econ">Ley Canaria de Transparencia</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Aspectos Legales</h4>
+          <ul class="footer-links">
+            <li><a data-modal="modal-aviso-legal">Aviso Legal</a></li>
+            <li><a data-modal="modal-privacidad">Política de Privacidad</a></li>
+            <li><a data-modal="modal-privacidad">Política de Cookies</a></li>
+            <li><a data-modal="modal-privacidad">Configuración de Cookies</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 Federación Empresarial de Gran Canaria. Todos los derechos reservados.</p>
+        <p style="opacity: 0.6; font-size: 0.8rem;">Defendemos lo cercano, impulsamos lo nuestro.</p>
+      </div>
+    </div>
+  </footer>
+
+  <div id="modal-transparencia-inst" class="modal-overlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Transparencia Institucional y Organizativa</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="legal-intro">En cumplimiento de la <strong>Ley 12/2014, de 26 de diciembre, de Transparencia de Canarias</strong>, FEDEGRANCA mantiene un compromiso firme con la rendición de cuentas, el acceso a la información pública y la integridad de su gestión corporativa.</p>
+        
+        <h4>Datos Identificativos de la Entidad</h4>
+        <table class="legal-table">
+          <tr><td><strong>Denominación Oficial</strong></td><td>Federación Empresarial de Gran Canaria (FEDEGRANCA)</td></tr>
+          <tr><td><strong>Naturaleza Jurídica</strong></td><td>Federación / Asociación empresarial de base asociativa, de carácter intersectorial y sin ánimo de lucro</td></tr>
+          <tr><td><strong>C.I.F.</strong></td><td><em>[Completar con el CIF G-XXXXXXXX]</em></td></tr>
+          <tr><td><strong>Domicilio Social</strong></td><td>Las Palmas de Gran Canaria, Provincia de Las Palmas, Islas Canarias, España</td></tr>
+          <tr><td><strong>Inscripción Pública</strong></td><td>Inscrita formalmente en el Registro de Asociaciones de Canarias / Dirección General de Trabajo</td></tr>
+          <tr><td><strong>Contacto Institucional</strong></td><td>fedegranca@gmail.com</td></tr>
+        </table>
+
+        <h4>Información Institucional, Misión y Visión</h4>
+        <p>FEDEGRANCA se constituye como una corporación de derecho privado y naturaleza federativa, surgida de la alianza estratégica de las principales asociaciones comerciales, sectoriales y vecinales de la isla de Gran Canaria (incluyendo AELEYCA, Schamann, Vegueta, EDARTE, ACOMISABA, Playa de Mogán, ASCOIVE y SATAUTE COMERCIAL). Nuestra misión primordial es actuar como voz unificada, defender el ecosistema comercial de proximidad, impulsar la cohesión territorial y vertebrar el desarrollo socioeconómico local.</p>
+        
+        <h4>Objeto Social y Fines Estatutarios</h4>
+        <p>Conforme a sus Estatutos vigentes, FEDEGRANCA persigue los siguientes objetivos de interés general y sectorial:</p>
+        <ul>
+          <li><strong>Representación y Defensa:</strong> Representar, gestionar de forma colectiva y defender los legítimos intereses socioeconómicos, laborales y empresariales de sus asociaciones miembro y sus autónomos/empresas asociadas ante las Administraciones Públicas (Locales, Insulares, Autonómicas y Estatales), sindicatos y demás agentes sociales.</li>
+          <li><strong>Dinámica y Competitividad:</strong> Promover e implantar planes de dinamización comercial, modernización tecnológica y digitalización del comercio local, tradicional y de zonas comerciales abiertas.</li>
+          <li><strong>Interlocución Institucional:</strong> Participar activamente en los órganos de consulta, mesas de negociación y consejos de participación ciudadana o empresarial que afecten al tejido productivo de Gran Canaria.</li>
+          <li><strong>Formación e Innovación:</strong> Diseñar, coordinar y ejecutar programas de formación continua, jornadas técnicas, asesoramiento especializado y transferencia de conocimiento en innovación, sostenibilidad y economía circular.</li>
+          <li><strong>Responsabilidad Social (RSE):</strong> Incentivar la adopción de buenas prácticas medioambientales, la igualdad de oportunidades y el empleo de calidad dentro del tejido empresarial federado.</li>
+        </ul>
+
+        <h4>Estructura Organizativa y Órganos de Gobierno</h4>
+        <p>El gobierno, administración y representación de la Federación están estructurados bajo principios estrictamente democráticos y de control colegiado:</p>
+        <ul>
+          <li><strong>Asamblea General:</strong> Es el órgano supremo de deliberación y decisión soberana de la Federación. Está integrada de forma paritaria por los representantes delegados de todas las asociaciones empresariales miembro. Se reúne con carácter ordinario de forma anual para examinar la gestión, aprobar presupuestos y definir las directrices de actuación estratégica.</li>
+          <li><strong>Junta Directiva:</strong> Es el órgano colegiado de gestión ejecutiva, administración ordinaria y dirección operativa de la Federación. Sus miembros ejercen sus funciones de representación orgánica de forma totalmente gratuita y altruista, no percibiendo dietas ni retribuciones por el desempeño de sus cargos directivos.</li>
+          <li><strong>Presidencia:</strong> Ostenta la máxima representación legal, institucional y jurídica de FEDEGRANCA de cara a terceros, administraciones públicas y tribunales, velando por la ejecución de los acuerdos adoptados por la Junta Directiva y la Asamblea General.</li>
+        </ul>
+
+        <h4>Marco Normativo de Aplicación</h4>
+        <p>La actividad y régimen jurídico de FEDEGRANCA se rige rigurosamente por el siguiente bloque normativo:</p>
+        <ul>
+          <li><strong>Ley Orgánica 1/2002, de 22 de marzo</strong>, reguladora del Derecho de Asociación (o en su defecto, Ley 19/1977, de 1 de abril, sobre regulación del derecho de asociación sindical).</li>
+          <li><strong>Ley 12/2014, de 26 de diciembre</strong>, de Transparencia de Canarias (especialmente en lo relativo al régimen de publicidad activa de entidades perceptoras de fondos públicos).</li>
+          <li><strong>Ley 19/2013, de 9 de diciembre</strong>, de transparencia, acceso a la información pública y buen gobierno (ámbito estatal).</li>
+          <li>Los propios <strong>Estatutos de la Federación</strong> inscritos y aprobados por la autoridad competente.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modal-transparencia-econ" class="modal-overlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Transparencia Económica, Financiera y Presupuestaria</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="legal-intro">En observancia del principio de transparencia financiera recogido en el Título II de la Ley 12/2014 de Canarias, FEDEGRANCA expone los criterios éticos, procedimentales y económicos que rigen sus recursos económicos.</p>
+        
+        <h4>Fuentes de Financiación y Recursos</h4>
+        <p>Para la consecución de sus fines estatutarios y el mantenimiento de su estructura operativa, FEDEGRANCA cuenta con las siguientes vías de ingreso:</p>
+        <ul>
+          <li><strong>Cuotas Asociativas:</strong> Aportaciones económicas periódicas (ordinarias o extraordinarias) sufragadas por las asociaciones integradas en la Federación.</li>
+          <li><strong>Financiación Pública:</strong> Subvenciones finalistas, convenios de colaboración y ayudas otorgadas por instituciones públicas (Cabildo de Gran Canaria, Gobierno de Canarias, Ayuntamientos u organismos de la Unión Europea) destinadas exclusivamente a proyectos públicos de dinamización, empleo o digitalización.</li>
+          <li><strong>Aportaciones Privadas y Patrocinios:</strong> Convenios de patrocinio publicitario o convenios sectoriales firmados con entidades privadas para el desarrollo de eventos, campañas de comercio o ferias.</li>
+        </ul>
+
+        <h4>Contratos y Convenios con Administraciones Públicas</h4>
+        <p>FEDEGRANCA se compromete a publicar de forma anual la relación detallada de los contratos y convenios de colaboración celebrados con entidades del sector público. Dicha información incluirá de forma transparente el objeto, la duración, las modificaciones si las hubiere, el procedimiento de adjudicación y el importe exacto percibido.</p>
+        <blockquote>
+          <strong>Nota de Publicidad Activa:</strong> De acuerdo con los límites vigentes, se informa que FEDEGRANCA no realiza contratos de concesión de obras o servicios públicos sometidos a regulación armonizada, limitándose su interacción con la administración al marco de ayudas competitivas o convenios regulados.
+        </blockquote>
+
+        <h4>Ayudas y Subvenciones Públicas Percibidas</h4>
+        <p>A efectos de lo dispuesto en la legislación autonómica, se hace constar que los fondos públicos adjudicados a esta federación se someten a estrictas auditorías de justificación de costes ante las entidades concedentes. Los importes correspondientes al ejercicio económico en curso y los anteriores desglosados (órgano concedente, actividad financiada e importe) son de libre acceso y están a disposición del público en esta sección web o en su defecto a través de solicitud formal.</p>
+
+        <h4>Cuentas Anuales, Presupuestos y Auditoría</h4>
+        <p>Las cuentas anuales de la Federación (compuestas por el Balance de Situación, la Cuenta de Pérdidas y Ganancias y la Memoria Económica), junto con el presupuesto previsto para cada ejercicio, son formuladas por la Junta Directiva y sometidas a votación y aprobación vinculante de la Asamblea General de Socios. Cualquier ciudadano o entidad interesada puede solicitar la consulta de los documentos de cierre contable enviando una solicitud formal motivada por correo electrónico a: <strong>fedegranca@gmail.com</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modal-aviso-legal" class="modal-overlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Aviso Legal y Condiciones de Uso</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>1. Datos Identificativos del Titular</h4>
+        <p>En cumplimiento de lo dispuesto en el artículo 10 de la <strong>Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y de Comercio Electrónico (LSSI-CE)</strong>, se ponen en conocimiento del usuario los datos identificativos y de contacto del titular del sitio web:</p>
+        <table class="legal-table">
+          <tr><td><strong>Titular de la Web</strong></td><td>Federación Empresarial de Gran Canaria (FEDEGRANCA)</td></tr>
+          <tr><td><strong>C.I.F. / N.I.F.</strong></td><td><em>[Completar con el CIF]</em></td></tr>
+          <tr><td><strong>Domicilio Social</strong></td><td>Las Palmas de Gran Canaria, España</td></tr>
+          <tr><td><strong>Email de Contacto</strong></td><td>fedegranca@gmail.com</td></tr>
+          <tr><td><strong>Control de Registro</strong></td><td>Inscrita en el Registro de Asociaciones de la Comunidad Autónoma de Canarias</td></tr>
+        </table>
+
+        <h4>2. Objeto y Condiciones Generales de Uso</h4>
+        <p>El presente texto legal regula el acceso, navegación y utilización de este sitio web. La navegación por este portal web le atribuye de manera inequívoca la condición de <strong>Usuario</strong>, lo que implica su aceptación plena, expresa y sin reservas de todas y cada una de las disposiciones contenidas en este Aviso Legal. Si no está de acuerdo con estas cláusulas, deberá abstenerse de utilizar este espacio web.</p>
+        <p>El Usuario se compromete a hacer un uso lícito, diligente, correcto y adecuado de los contenidos y servicios de la página web, de conformidad con la ley, la moral, las buenas costumbres y el orden público, evitando causar daños en los sistemas informáticos de la Federación o de terceros.</p>
+
+        <h4>3. Exención de Responsabilidad</h4>
+        <p>FEDEGRANCA realiza los máximos esfuerzos para asegurar que los contenidos, datos informativos y enlaces de este sitio web estén permanentemente actualizados y libres de errores. No obstante, la Federación no puede garantizar de forma absoluta la total infalibilidad ni la ausencia de virus o elementos lesivos introducidos por terceros maliciosos.</p>
+        <p>Consecuentemente, FEDEGRANCA declina toda responsabilidad por los daños y perjuicios directos o indirectos derivados de fallos de conexión, interrupciones técnicas, malware informático o el uso que los usuarios hagan de la información contenida en esta web. Las opiniones o contenidos de los enlaces a páginas externas (como los sitios web de los comercios asociados) pertenecen exclusivamente a sus respectivos titulares.</p>
+
+        <h4>4. Propiedad Intelectual e Industrial</h4>
+        <p>Todos los elementos que integran este sitio web (incluyendo a título enunciativo pero no limitativo: códigos fuente, textos, logotipos corporativos, marcas registradas, nombres comerciales, fotografías, gráficos, diseños, ilustraciones y archivos de audio o vídeo) son propiedad exclusiva de FEDEGRANCA o bien dispone de los derechos de explotación y licencias necesarias de sus legítimos autores.</p>
+        <p>Queda terminantemente prohibida la reproducción, distribución, comunicación pública, transformación o explotación comercial de cualquier contenido de esta web sin la autorización previa, expresa y por escrito de FEDEGRANCA.</p>
+
+        <h4>5. Ley Aplicable y Jurisdicción</h4>
+        <p>Para la resolución de todas las controversias, disputas o reclamaciones que puedan surgir en relación con el desarrollo, interpretación o navegación en este sitio web, se aplicará con carácter exclusivo la **legislación española**. Ambas partes, con renuncia expresa a cualquier otro fuero que pudiera corresponderles, se someten formalmente a la jurisdicción exclusiva de los Juzgados y Tribunales de la ciudad de <strong>Las Palmas de Gran Canaria</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div id="modal-privacidad" class="modal-overlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3>Política de Privacidad, Protección de Datos y Cookies</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="legal-intro">FEDEGRANCA garantiza la máxima confidencialidad en el tratamiento de los datos personales de sus usuarios, adaptando su operativa íntegramente al **Reglamento (UE) 2016/679 (RGPD)** y a la **Ley Orgánica 3/2018 (LOPDGDD)**.</p>
+        
+        <h4>Información Básica sobre Protección de Datos</h4>
+        <table class="legal-table">
+          <tr>
+            <td><strong>Responsable del Tratamiento</strong></td>
+            <td>Federación Empresarial de Gran Canaria (FEDEGRANCA)</td>
+          </tr>
+          <tr>
+            <td><strong>Finalidades Principales</strong></td>
+            <td>1. Gestión, resolución y respuesta de consultas y solicitudes recibidas a través del formulario de contacto.<br>
+            2. Tramitación y gestión administrativa de las solicitudes de adhesión de nuevas asociaciones o comercios.<br>
+            3. Envío de comunicaciones institucionales e informativas relacionadas con el comercio insular (siempre que medie consentimiento expreso).</td>
+          </tr>
+          <tr>
+            <td><strong>Legitimación</strong></td>
+            <td>Consentimiento libre, inequívoco, explícito y específico otorgado por el propio interesado al remitir el formulario o el correo (Art. 6.1.a del RGPD).</td>
+          </tr>
+          <tr>
+            <td><strong>Destinatarios de los Datos</strong></td>
+            <td>Los datos de carácter personal recabados son confidenciales. No se cederán datos a terceras empresas u organismos bajo ningún concepto, salvo existencia de obligación legal de carácter tributario o judicial.</td>
+          </tr>
+          <tr>
+            <td><strong>Plazo de Conservación</strong></td>
+            <td>Los datos personales se conservarán únicamente durante el tiempo estrictamente necesario para resolver la consulta formulada, o hasta que el usuario revoque su consentimiento o ejercite su derecho de supresión.</td>
+          </tr>
+        </table>
+
+        <h4>Derechos del Interesado (Derechos ARCO-POL)</h4>
+        <p>La normativa de protección de datos otorga a los usuarios plenos derechos de control sobre su información. Usted puede ejercitar de forma totalmente gratuita los siguientes derechos:</p>
+        <ul>
+          <li><strong>Acceso:</strong> Saber qué datos personales estamos tratando sobre su persona.</li>
+          <li><strong>Rectificación:</strong> Solicitar la corrección de datos inexactos, erróneos o desactualizados.</li>
+          <li><strong>Supresión ("Derecho al olvido"):</strong> Exigir que sus datos sean eliminados por completo de nuestros ficheros.</li>
+          <li><strong>Limitación del Tratamiento:</strong> Restringir de manera temporal el uso de sus datos en supuestos concretos regulados por ley.</li>
+          <li><strong>Oposición:</strong> Oponerse a que tratemos sus datos para finalidades informativas o de gestión interna.</li>
+          <li><strong>Portabilidad:</strong> Solicitar la entrega de sus datos en un formato electrónico estructurado de uso común para transmitirlos a otra entidad.</li>
+        </ul>
+        <p>Para ejercitar cualquiera de estos derechos, deberá remitir un correo electrónico firmado indicando de forma clara el derecho que desea solicitar a la dirección: <strong>fedegranca@gmail.com</strong> (aportando copia de documento oficial de identidad si fuese estrictamente requerido para verificar la identidad de la solicitud).</p>
+        <p>Asimismo, si considera que sus derechos han sido vulnerados, tiene derecho a interponer una reclamación formal ante la <strong>Agencia Española de Protección de Datos (AEPD)</strong> a través de su sede electrónica oficial.</p>
+
+        <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #e5e7eb;">
+
+        <h4>Política de Cookies Colectadas</h4>
+        <p>Este sitio web utiliza única y exclusivamente <strong>cookies técnicas y esenciales</strong>. Estas son pequeños ficheros de datos que se almacenan temporalmente en el terminal del usuario y que son imprescindibles para permitir la navegación segura, la carga fluida de los contenidos, el uso correcto de las tipografías de diseño y la activación de las funciones interactivas básicas (como la apertura y cierre de estos mismos cuadros modales).</p>
+        <ul>
+          <li>Este sitio web **no utiliza cookies de rastreo masivo**, ni cookies publicitarias ni herramientas de segmentación comercial que elaboren perfiles de comportamiento del usuario.</li>
+          <li>Al tratarse de cookies estrictamente técnicas indispensables para el funcionamiento y seguridad de la plataforma, la normativa europea **exime de la obligación de recabar un consentimiento previo**, garantizando que la privacidad del visitante se mantiene intacta en todo momento.</li>
+        </ul>
+        <p>Si lo desea, el Usuario puede bloquear, limitar o desactivar la instalación de cookies alterando la configuración de privacidad de las opciones de su navegador de internet (Edge, Chrome, Firefox o Safari), asumiendo que ciertas partes interactivas de la navegación web podrían no ejecutarse correctamente.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <!-- Lógica de modales legales -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('a[data-modal]').forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const m = document.getElementById(link.getAttribute('data-modal'));
+          if (m) { m.classList.add('active'); document.body.classList.add('modal-open'); }
+        });
+      });
+      const closeModal = () => {
+        document.querySelectorAll('.modal-overlay:not(#dirOverlay)').forEach(m => m.classList.remove('active'));
+        document.body.classList.remove('modal-open');
+      };
+      document.querySelectorAll('.modal-close-btn').forEach(b => b.addEventListener('click', closeModal));
+      document.querySelectorAll('.modal-overlay:not(#dirOverlay)').forEach(o => {
+        o.addEventListener('click', e => { if (e.target === o) closeModal(); });
+      });
+    });
+  </script>
+
+  <!-- Directorio de empresas (datos y lógica separados) -->
+  <script src="directorio.js" defer></script>
+
+  <script>
+    var swiper = new Swiper(".mySwiper", {
+      spaceBetween: 30,
+      centeredSlides: true,
+      autoplay: { delay: 4000, disableOnInteraction: false },
+      pagination: { clickable: true },
+      navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+      loop: true
+    });
+  </script>
+
+  <!-- Envío del formulario de contacto a Formspree (AJAX, sin recargar la página) -->
+  <script>
+    document.getElementById('contactoForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const btn  = document.getElementById('contactoFormBtn');
+      const msg  = document.getElementById('contactoFormMsg');
+
+      btn.disabled = true;
+      btn.textContent = 'Enviando…';
+      msg.style.display = 'none';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      })
+        .then(response => {
+          if (response.ok) {
+            msg.textContent = '¡Gracias! Tu mensaje se ha enviado correctamente. Te responderemos lo antes posible.';
+            msg.style.background = '#eafaf0';
+            msg.style.color = '#1e7e4e';
+            msg.style.display = 'block';
+            form.reset();
+          } else {
+            return response.json().then(data => {
+              throw new Error((data && data.errors) ? data.errors.map(er => er.message).join(', ') : 'Error al enviar');
+            });
+          }
+        })
+        .catch(() => {
+          msg.textContent = 'No se pudo enviar el mensaje. Por favor, inténtalo de nuevo o escribe directamente a fedegranca@gmail.com.';
+          msg.style.background = '#fdecea';
+          msg.style.color = '#b3261e';
+          msg.style.display = 'block';
+        })
+        .finally(() => {
+          btn.disabled = false;
+          btn.textContent = 'Enviar Mensaje de Contacto';
+        });
+    });
+  </script>
+
+</body>
+</html>
